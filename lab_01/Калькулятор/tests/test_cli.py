@@ -1,6 +1,5 @@
 import subprocess
 
-
 def test_CLI_division_by_zero():
     result = subprocess.run(
         ["python", "-m", "toolkit", "calc", "43 / 0"],
@@ -8,10 +7,8 @@ def test_CLI_division_by_zero():
         text=True,
     )
 
-
     assert result.returncode != 0
     assert result.stderr != ""
-
 
 def test_CLI_unmatched_units():
     result = subprocess.run(
