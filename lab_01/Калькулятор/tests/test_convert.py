@@ -1,5 +1,6 @@
+import pytest
 from toolkit.converter import convert
-
+from toolkit.errors import ConverterError
 
 class TestConverter:
     def test_from_m_to_km(self):
@@ -14,5 +15,12 @@ class TestConverter:
     def test_same_units(self):
         assert convert(5, "m", "m") == 5.0
 
-
-
+def test_unmatched_units():
+    with pytest.raises(ConverterError):
+        convert(15, "km", "kg")
+def test_under_absolute_zero_K():
+    with pytest.raises(ConverterError):
+        convert(-10, "K", "C")
+def test_unknown_unit():
+    with pytest.raises(ConverterError):
+        convert(21, "km", "miles")

@@ -1,4 +1,6 @@
-def tokenize_char(expr:str): 
+from toolkit.errors import CalculatorError
+
+def tokenization(expr:str): 
     tokens = []
     i = 0
     while i < len(expr):
@@ -42,11 +44,11 @@ def tokenize_char(expr:str):
                 tokens.append(('OPERATOR', expr[i]))
                 i += 1
                 continue
-            raise ValueError(f"Неизвестный символ: {expr[i]}")
+            raise CalculatorError(f"Неизвестный символ: {expr[i]}")
     return tokens
 
 
-def to_rpn(tokens):
+def validation(tokens):
     precedence = {'+': 1, '-': 1, '*': 2, '/': 2,'u+': 3, 'u-': 3}
     output = []
     stack = []
@@ -75,10 +77,10 @@ def to_rpn(tokens):
             while stack and stack[-1][0] != 'LPAREN':
                 output.append(stack.pop())
             if not stack:
-                raise ValueError("Несбалансированные скобки: лишняя ')'")
+                raise CalculatorError("Несбалансированные скобки: лишняя ')'")
             stack.pop()   
         else:
-            raise ValueError(f"Неизвестный токен: {token}")
+            raise CalculatorError(f"Неизвестный токен: {token}")
     while stack:
         output.append(stack.pop())
 
@@ -101,24 +103,24 @@ def calculator(rpn_tokens):
             op = token[1]
             if op in ('u+', 'u-'):
                 if len(stack) < 1:
-                    raise ValueError("Недостаточно операндов для унарной операции")
+                    raise CalculatorError("Недостаточно операндов для унарной операции")
                 a = stack.pop()
                 stack.append(ops[op](a))
             else:
                 if len(stack) < 2:
-                    raise ValueError("Недостаточно операндов для бинарной операции")
+                    raise CalculatorError("Недостаточно операндов для бинарной операции")
                 b = stack.pop()
                 a = stack.pop()
                 stack.append(ops[op](a, b))
         else:
-            raise ValueError(f"Неизвестный токен в RPN: {token}")
+            raise CalculatorError(f"Неизвестный токен в RPN: {token}")
 
     if len(stack) != 1:
-        raise ValueError("Ошибка вычисления: в стеке не один результат")
+        raise CalculatorError("Ошибка вычисления: в стеке не один результат")
     return stack[0]
 
 
 def calculate(expr: str):
-    tokens = tokenize_char(expr)
-    rpn = to_rpn(tokens)
+    tokens = tokenization(expr)
+    rpn = validation(tokens)
     return calculator(rpn)

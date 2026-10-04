@@ -3,6 +3,7 @@ import sys
 
 from .calculator import calculate
 from .converter import convert
+from .errors import ConverterError
 
 parser = argparse.ArgumentParser(prog="python -m toolkit", description="Калькулятор и конвертер величин")
 

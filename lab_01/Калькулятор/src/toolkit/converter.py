@@ -13,9 +13,9 @@ temp_units = {"c","f","k"}
 def conversions_temp_v_kelvin(value:float, unit: str):
         unit = unit.lower()
         if unit == "c":
-            return value + 273.15,        
+            return value + 273.15    
         if unit == "f":
-            return (value + 32) * 5/9 +273.15
+            return (value - 32) * 5/9 +273.15
         if unit == "k":
             return value
         else:
@@ -37,24 +37,24 @@ def get_group(unit:str):
             return "dlina"
         if unit in conversions_massa:
             return "massa"
-        if unit in conversions_temp_v_kelvin:
+        if unit in temp_units:
             return "temp"
         return None
 
 def convert(value: float, from_unit: str, to_unit:str):
     try:
-         value = float(value)
-    except (TypeError, ValueError):
-         raise ConverterError("Неверное числовое значение")
+        value = float(value)
+    except (TypeError, ConverterError):
+        raise ConverterError("Неверное числовое значение")
 
     group_from = get_group(from_unit)
     group_to = get_group(to_unit)
 
     if group_from is None or group_to is None:
-        raise ValueError("Неизвестная единица измерения")
+        raise ConverterError("Неизвестная единица измерения")
     
     if group_from != group_to:
-        raise ValueError("Конвертация между разными группами единиц запрещена")
+        raise ConverterError("Конвертация между разными группами единиц запрещена")
     
     frmunt = from_unit.lower()
     tunt = to_unit.lower()
@@ -71,22 +71,11 @@ def convert(value: float, from_unit: str, to_unit:str):
         return result
     
     elif group_from == "temp":
-        kelvin = conversions_temp_v_kelvin[frmunt](value)
+        kelvin = conversions_temp_v_kelvin(value, frmunt )
         if kelvin < 0:
-            raise ValueError("Температура ниже абсолютного нуля запрещена")
-        result = conversions_temp[tunt](kelvin)
+            raise ConverterError("Температура ниже абсолютного нуля запрещена")
+        result = conversions_temp(kelvin, tunt)
         return result
     raise ConverterError("Не удалось выполнить конвертацию")
-#if __name__ == "_main_":
-#    try:
-#        val = float(input("Введите значение: "))
-#        frm = input("Из какой единицы (mm/cm/m/km, g/kg, c/f/k): ")
-#        to = input("В какую единицу (mm/cm/m/km, g/kg, c/f/k): ")
-#        res = converter(val, frm, to)
-#        print(f"{val} {frm} = {res} {to}")
-#    except ValueError as e:
-#        print("Ошибка:", e)
-#    finally:
-#         print("Программа завершена.")
 
 
